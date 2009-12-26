@@ -1,0 +1,17 @@
+# -*- coding: utf-8 -*-
+#+begin_html
+---
+layout: article
+title: Con mates y física
+category: mates, física
+---
+#+end_html
+
+* El segundo
+  A ver qué tal las categorías
+*** Entrada en el segundo                                              :blog:
+    :PROPERTIES:
+    :on:       <2009-12-26 Sat 13:58>
+    :END:
+* COMMENT Options
+#+FILETAGS: :cjr:
