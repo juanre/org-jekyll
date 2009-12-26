@@ -1,9 +1,12 @@
+
 (defun org-jekyll-get-files ()
+  "Get a list of files belonging to the current project."
   (org-publish-initialize-files-alist)
   (org-publish-get-base-files (org-publish-get-project-from-filename 
                                (buffer-file-name) 'up)))
 
 (defun org-jekyll-publishing-directory ()
+  "Where does the project go. "
   (org-publish-initialize-files-alist)
   (concat (plist-get (cdr (org-publish-get-project-from-filename 
                            (buffer-file-name) 'up)) :publishing-directory)
@@ -22,6 +25,10 @@ list that holds buffers to release."
       buf)))
 
 (defun org-jekyll-export-blog ()
+  "Export all entries in project files that have a :blog: keyword
+and an :on: datestamp.  Property drawers are exported as
+front-matters, outline entry title is the exported document
+title. "
   (interactive)
   (save-excursion
     (let ((posts-dir (org-jekyll-publishing-directory)))
