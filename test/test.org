@@ -2,27 +2,26 @@
 #+begin_html
 ---
 layout: default
-title: Pero funcionará
+title: Org-jekyll test
 ---
 #+end_html
 
-* Prueba de si funciona
-  A ver qué exporta!
-*** Con un segundo nivel
-    Con algo de contenido. 
+* Non-blog entry
+  See what it exports.
+*** With a second level
+    And some content
 * Blog                                                                 :blog:
-*** Primera entrada del blog
+*** First blog entry
     :PROPERTIES:
     :on:       <2009-12-26 Sat>
     :layout:   post
-    :extra:    primera
+    :extra:    first
     :END:
-    Con algo de contenido!
-*** Segunda entrada del blog
-    :PROPERTIES:
-    :on:       <2009-12-26 Sat 13:58>
-    :categories:  test otro
-    :END:
-    Con contenido /de la segunda/.  
-* COMMENT Options
-#+FILETAGS: :cjr:
+    With some content in the first entry. 
+*** Here come more entries
+***** Second blog entry
+      :PROPERTIES:
+      :on:       <2009-12-26 Sat 13:58>
+      :categories:  test otro
+      :END:
+      With content in /the second/.  

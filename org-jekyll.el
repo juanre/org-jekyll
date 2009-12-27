@@ -1,3 +1,28 @@
+;;; org-jekyll.el --- Export jekyll-ready posts form org-mode entries
+;;; 
+;;; Author: Juan Reyero
+;;; Version: 0.1
+;;; Home page: http://juanreyero.com/open/org-jekyll/
+;;; Repository: http://github.com/juanre/org-jekyll
+;;; Public clone: git://github.com/juanre/org-jekyll.git
+;;; 
+;;; Summary
+;;; -------
+;;; 
+;;; Extract subtrees from your org-publish project files that have
+;;; a :blog: keyword and an :on: property with a timestamp, and
+;;; export them to a subdirectory _posts of your project's publishing
+;;; directory in the year-month-day-title.html format that Jekyll
+;;; expects.  Properties are passed over as yaml front-matter in the
+;;; exported files.  The title of the subtree is the title of the
+;;; entry.
+;;;
+;;; Look at http://orgmode.org/worg/org-tutorials/org-jekyll.php for
+;;; more info on how to integrate org-mode with Jekyll, and for the
+;;; inspiration of the main function down there.
+
+(defvar org-jekyll-new-buffers nil
+  "Buffers created to visit org-publish project files looking for blog posts.")
 
 (defun org-jekyll-get-files ()
   "Get a list of files belonging to the current project."
@@ -45,7 +70,7 @@ title. "
                      (time (cdr (assoc "on" props)))
                      (yaml-front-matter (copy-alist props)))
                 (unless (assoc "layout" yaml-front-matter)
-                  (push '("layout" . "default") yaml-front-matter))
+                  (push '("layout" . "post") yaml-front-matter))
                 (when time
                   (let* ((heading (org-get-heading t))
                          (title (replace-regexp-in-string
@@ -60,7 +85,8 @@ title. "
                          (yaml-front-matter (cons (cons "title" heading) 
                                                   yaml-front-matter))
                          html)
-                    (org-narrow-to-subtree)
+                    ;;(org-narrow-to-subtree)
+                    (outline-mark-subtree)
                     (setq html (org-export-as-html nil nil nil 'string t nil))
                     (set-buffer org-buffer) (widen)
                     (with-temp-file (expand-file-name to-file posts-dir)
@@ -77,3 +103,4 @@ title. "
        (org-jekyll-get-files))
       (org-release-buffers org-jekyll-new-buffers))))
 
+(provide 'org-jekyll)
