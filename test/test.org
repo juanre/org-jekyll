@@ -11,6 +11,12 @@ title: Org-jekyll test
 *** With a second level
     And some content
 * Blog                                                                 :blog:
+*** Second blog entry                                                  :blog:
+    :PROPERTIES:
+    :on:       <2009-12-26 Sat 13:58>
+    :categories:  test otro
+    :END:
+    With content in /the second/.  
 *** First blog entry
     :PROPERTIES:
     :on:       <2009-12-26 Sat>
@@ -18,10 +24,3 @@ title: Org-jekyll test
     :extra:    first
     :END:
     With some content in the first entry. 
-*** Here come more entries
-***** Second blog entry
-      :PROPERTIES:
-      :on:       <2009-12-26 Sat 13:58>
-      :categories:  test otro
-      :END:
-      With content in /the second/.  
