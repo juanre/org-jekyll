@@ -10,17 +10,18 @@ title: Org-jekyll test
   See what it exports.
 *** With a second level
     And some content
-* Blog                                                                 :blog:
-*** Second blog entry                                                  :blog:
-    :PROPERTIES:
-    :on:       <2009-12-26 Sat 13:58>
-    :categories:  test otro
-    :END:
-    With content in /the second/.  
-*** First blog entry
-    :PROPERTIES:
-    :on:       <2009-12-26 Sat>
-    :layout:   post
-    :extra:    first
-    :END:
-    With some content in the first entry. 
+*** Blog                                                               :blog:
+***** Second blog entry
+      :PROPERTIES:
+      :on:       <2009-12-26 Sat 13:58>
+      :categories:  test otro
+      :END:
+      With content in /the second/.  
+***** Further indent
+******* First blog entry
+        :PROPERTIES:
+        :on:       <2009-12-26 Sat>
+        :layout:   post
+        :extra:    first
+        :END:
+        With some content in the first entry. 

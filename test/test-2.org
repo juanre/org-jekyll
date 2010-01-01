@@ -7,11 +7,13 @@ category: mates, física
 ---
 #+end_html
 
-* El segundo
-  A ver qué tal las categorías
-*** Entrada en el segundo                                              :blog:
-    :PROPERTIES:
-    :on:       <2009-12-26 Sat 13:58>
-    :END:
+* Second one
+  Test what happens when the blog post gets demoted in the outline
+*** Further down
+***** Entry in the second file                                         :blog:
+      :PROPERTIES:
+      :on:       <2009-12-26 Sat 13:58>
+      :END:
+      Add something to it. 
 * COMMENT Options
 #+FILETAGS: :cjr:
