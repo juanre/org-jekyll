@@ -27,8 +27,12 @@
 (defun org-jekyll-get-files ()
   "Get a list of files belonging to the current project."
   (org-publish-initialize-files-alist)
-  (org-publish-get-base-files (org-publish-get-project-from-filename 
-                               (buffer-file-name) 'up)))
+  (org-publish-get-base-files 
+   (car (org-publish-expand-projects 
+         (list (org-publish-get-project-from-filename 
+                (buffer-file-name) 'up))))))
+ ;;(org-publish-get-base-files (org-publish-get-project-from-filename 
+ ;;                             (buffer-file-name) 'up)))
 
 (defun org-jekyll-publishing-directory ()
   "Where does the project go. "
@@ -86,7 +90,11 @@ title. "
                     (let ((level (- (org-reduced-level (org-outline-level)) 1))
                           (contents (buffer-substring (point-min) (point-max))))
                       (dotimes (n level nil) (org-promote-subtree))
-                      (setq html (org-export-as-html nil nil nil 'string t nil))
+                      (setq html 
+                            (replace-regexp-in-string 
+                             "<h2 id=\"sec-1\">\\(.+\\)</h2>"
+                             "<h2 id=\"sec-1\"><a href=\"{{ page.url }}\">\\1</a></h2>"
+                             (org-export-as-html nil nil nil 'string t nil)))
                       (set-buffer org-buffer)
                       (delete-region (point-min) (point-max))
                       (insert contents)
