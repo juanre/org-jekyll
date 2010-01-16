@@ -21,20 +21,23 @@
 ;;; more info on how to integrate org-mode with Jekyll, and for the
 ;;; inspiration of the main function down there.
 
+(defvar org-jekyll-category "lang"
+  "Specify a property which, if defined in the entry, is used as
+  a category: the post is written to category/_posts. Ignored if nil. ")
+
+(defvar org-jekyll-localize-dir "loc/"
+  "If non-nil and the lang property is set in the entry,
+   org-jekyll will look for a lang.yml file in this directory and
+   include it in the front matter of the exported entry.")
+
 (defvar org-jekyll-new-buffers nil
   "Buffers created to visit org-publish project files looking for blog posts.")
 
-(defvar org-jekyll-use-lang-as-category t
-  "If :lang: is set in the post it is used to build the output
-   directory as lang/_posts")
-
-(defun org-jekyll-publishing-directory (project lang)
+(defun org-jekyll-publish-dir (project &optional category)
   "Where does the project go."
   (concat (plist-get (cdr (assoc project org-publish-project-alist)) 
                      :publishing-directory)
-          (if (and lang org-jekyll-use-lang-as-category)
-              (concat lang "/")
-            "")
+          (if category (concat category "/") "")
           "_posts/"))
 
 (defun org-get-jekyll-file-buffer (file)
@@ -49,10 +52,20 @@ list that holds buffers to release."
       (if buf (push buf org-jekyll-new-buffers))
       buf)))
 
+(defun org-jekyll-slurp-yaml (fname)
+  (remove "---" (if (file-exists-p fname)
+                    (split-string (with-temp-buffer
+                                    (insert-file-contents fname)
+                                    (buffer-string))
+                                  "\n" t))))
+
 (defun org-jekyll-export-entry (project)
   (let* ((props (org-entry-properties nil 'standard))
          (time (cdr (assoc "on" props)))
          (lang (cdr (assoc "lang" props)))
+         (category (if org-jekyll-category
+                       (cdr (assoc org-jekyll-category props))
+                     nil))
          (yaml-front-matter (copy-alist props)))
     (unless (assoc "layout" yaml-front-matter)
       (push '("layout" . "post") yaml-front-matter))
@@ -83,12 +96,17 @@ list that holds buffers to release."
           (save-buffer))
         (widen)
         (with-temp-file (expand-file-name 
-                         to-file (org-jekyll-publishing-directory project lang))
+                         to-file (org-jekyll-publish-dir project category))
           (when yaml-front-matter
             (insert "---\n")
             (mapc (lambda (pair) 
                     (insert (format "%s: %s\n" (car pair) (cdr pair))))
                   yaml-front-matter)
+            (if (and org-jekyll-localize-dir lang)
+                (mapc (lambda (line)
+                        (insert (format "%s\n" line)))
+                      (org-jekyll-slurp-yaml (concat org-jekyll-localize-dir
+                                                     lang ".yml"))))
             (insert "---\n\n"))
           (insert html))))))
 
