@@ -35,10 +35,14 @@
 
 (defun org-jekyll-publish-dir (project &optional category)
   "Where does the project go."
-  (concat (plist-get (cdr (assoc project org-publish-project-alist)) 
-                     :publishing-directory)
-          (if category (concat category "/") "")
-          "_posts/"))
+  (let ((pdir (plist-get (cdr (assoc project org-publish-project-alist)) 
+                         :blog-publishing-directory)))
+    (unless pdir
+      (setq pdir (plist-get (cdr (assoc project org-publish-project-alist)) 
+                            :publishing-directory)))
+    (concat pdir
+            (if category (concat category "/") "")
+            "_posts/")))
 
 (defun org-get-jekyll-file-buffer (file)
   "Get a buffer visiting FILE.  If the buffer needs to be
