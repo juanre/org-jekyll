@@ -65,6 +65,12 @@ list that holds buffers to release."
                                     (buffer-string))
                                   "\n" t))))
 
+(defun ensure-directories-exist (fname)
+  (let ((dir (file-name-directory fname)))
+    (unless (file-accessible-directory-p dir)
+      (make-directory dir t)))
+  fname)
+
 (defun org-jekyll-export-entry (project)
   (let* ((props (org-entry-properties nil 'standard))
          (time (cdr (or (assoc "on" props)
@@ -103,8 +109,9 @@ list that holds buffers to release."
           (insert contents)
           (save-buffer))
         (widen)
-        (with-temp-file (expand-file-name 
-                         to-file (org-jekyll-publish-dir project category))
+        (with-temp-file (ensure-directories-exist
+                         (expand-file-name 
+                          to-file (org-jekyll-publish-dir project category)))
           (when yaml-front-matter
             (insert "---\n")
             (mapc (lambda (pair) 
