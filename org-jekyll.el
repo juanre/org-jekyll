@@ -67,8 +67,10 @@ list that holds buffers to release."
 
 (defun org-jekyll-export-entry (project)
   (let* ((props (org-entry-properties nil 'standard))
-         (time (cdr (assoc "on" props)))
-         (lang (cdr (assoc "lang" props)))
+         (time (cdr (or (assoc "on" props)
+                        (assoc "ON" props))))
+         (lang (cdr (or (assoc "lang" props)
+                        (assoc "LANG" props))))
          (category (if org-jekyll-category
                        (cdr (assoc org-jekyll-category props))
                      nil))
@@ -141,7 +143,7 @@ title. "
          (if (string= (file-name-extension jfile) "org")
              (with-current-buffer (org-get-jekyll-file-buffer jfile)
                (org-map-entries (lambda () (org-jekyll-export-entry project))
-                                "blog")))))
+                                "blog|BLOG")))))
      (org-publish-get-files (org-publish-expand-projects
                              (list (org-publish-get-project-from-filename 
                                     (buffer-file-name) 'up)))))
