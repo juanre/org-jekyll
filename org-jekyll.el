@@ -21,11 +21,13 @@
 ;;; more info on how to integrate org-mode with Jekyll, and for the
 ;;; inspiration of the main function down there.
 
-(defvar org-jekyll-category "lang"
+(defvar org-jekyll-category nil
   "Specify a property which, if defined in the entry, is used as
-  a category: the post is written to category/_posts. Ignored if nil. ")
+  a category: the post is written to category/_posts. Ignored if
+  nil. Use \"lang\" if you want to send posts in different
+  languages to different directories.")
 
-(defvar org-jekyll-localize-dir "loc/"
+(defvar org-jekyll-localize-dir nil
   "If non-nil and the lang property is set in the entry,
    org-jekyll will look for a lang.yml file in this directory and
    include it in the front matter of the exported entry.")
