@@ -36,7 +36,8 @@
   "Buffers created to visit org-publish project files looking for blog posts.")
 
 (defun org-jekyll-publish-dir (project &optional category)
-  "Where does the project go."
+  "Where does the project go, by default a :blog-publishing-directory 
+   entry in the org-publish-project-alist."
   (let ((pdir (plist-get (cdr (assoc project org-publish-project-alist)) 
                          :blog-publishing-directory)))
     (unless pdir
@@ -45,6 +46,15 @@
     (concat pdir
             (if category (concat category "/") "")
             "_posts/")))
+
+(defun org-jekyll-site-root (project)
+  "Site root, like http://yoursite.com, from which blog
+  permalinks follow.  Needed to replace entry titles with
+  permalinks that RSS agregators and google buzz know how to
+  follow.  Look for a :site-root entry in the org-publish-project-alist."
+  (or (plist-get (cdr (assoc project org-publish-project-alist)) :site-root)
+      ""))
+
 
 (defun org-get-jekyll-file-buffer (file)
   "Get a buffer visiting FILE.  If the buffer needs to be
@@ -97,12 +107,14 @@ list that holds buffers to release."
              html)
         (org-narrow-to-subtree)
         (let ((level (- (org-reduced-level (org-outline-level)) 1))
-              (contents (buffer-substring (point-min) (point-max))))
+              (contents (buffer-substring (point-min) (point-max)))
+              (site-root (org-jekyll-site-root project)))
           (dotimes (n level nil) (org-promote-subtree))
           (setq html 
                 (replace-regexp-in-string 
                  "<h2 id=\"sec-1\">\\(.+\\)</h2>"
-                 "<h2 id=\"sec-1\"><a href=\"{{ page.url }}\">\\1</a></h2>"
+                 (concat "<h2 id=\"sec-1\"><a href=\"" site-root
+                         "{{ page.url }}\">\\1</a></h2>")
                  (org-export-as-html nil nil nil 'string t nil)))
           (set-buffer org-buffer)
           (delete-region (point-min) (point-max))
