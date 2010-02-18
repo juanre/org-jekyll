@@ -1,7 +1,7 @@
 ;;; org-jekyll.el --- Export jekyll-ready posts form org-mode entries
 ;;; 
 ;;; Author: Juan Reyero
-;;; Version: 0.1
+;;; Version: 0.2
 ;;; Home page: http://juanreyero.com/open/org-jekyll/
 ;;; Repository: http://github.com/juanre/org-jekyll
 ;;; Public clone: git://github.com/juanre/org-jekyll.git
@@ -51,7 +51,7 @@
   "Site root, like http://yoursite.com, from which blog
   permalinks follow.  Needed to replace entry titles with
   permalinks that RSS agregators and google buzz know how to
-  follow.  Look for a :site-root entry in the org-publish-project-alist."
+  follow.  Looks for a :site-root entry in the org-publish-project-alist."
   (or (plist-get (cdr (assoc project org-publish-project-alist)) :site-root)
       ""))
 
@@ -81,6 +81,26 @@ list that holds buffers to release."
       (make-directory dir t)))
   fname)
 
+(defun org-jekyll-sanitize-string (str)
+  (setq str (downcase str))
+  (dolist (c '(("á" . "a")
+               ("é" . "e")
+               ("í" . "i")
+               ("ó" . "o")
+               ("ú" . "u")
+               ("à" . "a")
+               ("è" . "e")
+               ("ì" . "i")
+               ("ò" . "o")
+               ("ù" . "u")
+               ("ñ" . "n")
+               ("ç" . "s")
+               ("$" . "S")
+               ("€" . "E")))
+    (setq str (replace-regexp-in-string (car c) (cdr c) str)))
+  (replace-regexp-in-string "[^abcdefghijklmnopqrstuvwxyz-]" "" 
+                            (replace-regexp-in-string " +" "-" str)))
+    
 (defun org-jekyll-export-entry (project)
   (let* ((props (org-entry-properties nil 'standard))
          (time (cdr (or (assoc "on" props)
@@ -100,7 +120,8 @@ list that holds buffers to release."
                                                "[ \t]" "-" heading)))
              (str-time (and (string-match "\\([[:digit:]\-]+\\) " time)
                             (match-string 1 time)))
-             (to-file (format "%s-%s.html" str-time title))
+             (to-file (format "%s-%s.html" str-time 
+                              (org-jekyll-sanitize-string title)))
              (org-buffer (current-buffer))
              (yaml-front-matter (cons (cons "title" heading) 
                                       yaml-front-matter))
