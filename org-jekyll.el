@@ -1,7 +1,7 @@
 ;;; org-jekyll.el --- Export jekyll-ready posts form org-mode entries
 ;;; 
 ;;; Author: Juan Reyero
-;;; Version: 0.2
+;;; Version: 0.3
 ;;; Home page: http://juanreyero.com/open/org-jekyll/
 ;;; Repository: http://github.com/juanre/org-jekyll
 ;;; Public clone: git://github.com/juanre/org-jekyll.git
@@ -58,15 +58,15 @@
 
 (defun org-get-jekyll-file-buffer (file)
   "Get a buffer visiting FILE.  If the buffer needs to be
-created, add it to the list of buffers which might be released
-later.  Copied from org-get-agenda-file-buffer, and modified the
-list that holds buffers to release."
+  created, add it to the list of buffers which might be released
+  later.  Copied from org-get-agenda-file-buffer, and modified
+  the list that holds buffers to release."
   (let ((buf (org-find-base-buffer-visiting file)))
     (if buf
         buf
-      (setq buf (find-file-noselect file))
-      (if buf (push buf org-jekyll-new-buffers))
-      buf)))
+      (progn (setq buf (find-file-noselect file))
+             (if buf (push buf org-jekyll-new-buffers))
+             buf))))
 
 (defun org-jekyll-slurp-yaml (fname)
   (remove "---" (if (file-exists-p fname)
@@ -81,7 +81,7 @@ list that holds buffers to release."
       (make-directory dir t)))
   fname)
 
-(defun org-jekyll-sanitize-string (str)
+(defun org-jekyll-sanitize-string (str project)
   (if (plist-get (cdr (assoc project org-publish-project-alist)) 
                  :jekyll-sanitize-permalinks)
       (progn (setq str (downcase str))
@@ -124,7 +124,7 @@ list that holds buffers to release."
              (str-time (and (string-match "\\([[:digit:]\-]+\\) " time)
                             (match-string 1 time)))
              (to-file (format "%s-%s.html" str-time 
-                              (org-jekyll-sanitize-string title)))
+                              (org-jekyll-sanitize-string title project)))
              (org-buffer (current-buffer))
              (yaml-front-matter (cons (cons "title" heading) 
                                       yaml-front-matter))
@@ -133,6 +133,10 @@ list that holds buffers to release."
         (let ((level (- (org-reduced-level (org-outline-level)) 1))
               (contents (buffer-substring (point-min) (point-max)))
               (site-root (org-jekyll-site-root project)))
+          ;; Without the promotion the header with which the headline
+          ;; is exported depends on the level.  With the promotion it
+          ;; fails when the entry is not visible (ie, within a folded
+          ;; entry).
           (dotimes (n level nil) (org-promote-subtree))
           (setq html 
                 (replace-regexp-in-string 
@@ -161,14 +165,16 @@ list that holds buffers to release."
             (insert "---\n\n"))
           (insert html))))))
 
+; Evtl. needed to keep compiler happy:
+(declare-function org-publish-get-project-from-filename "org-publish"
+                  (filename &optional up))
+
 (defun org-jekyll-export-current-entry ()
   (interactive)
   (save-excursion
-    (org-publish-initialize-files-alist)
-    (let ((project-name (cdr (assoc (expand-file-name (buffer-file-name))
-                                    org-publish-files-alist))))
+    (let ((project (org-publish-get-project-from-filename buffer-file-name)))
       (org-back-to-heading t)
-      (org-jekyll-export-entry project-name))))
+      (org-jekyll-export-entry project))))
 
 (defun org-jekyll-export-blog ()
   "Export all entries in project files that have a :blog: keyword
@@ -177,19 +183,19 @@ front-matters, outline entry title is the exported document
 title. "
   (interactive)
   (save-excursion
-    (org-publish-initialize-files-alist)
     (setq org-jekyll-new-buffers nil)
-    (mapc 
-     (lambda (jfile-project)
-       (let ((jfile (car jfile-project))
-             (project (cdr jfile-project)))
-         (if (string= (file-name-extension jfile) "org")
-             (with-current-buffer (org-get-jekyll-file-buffer jfile)
-               (org-map-entries (lambda () (org-jekyll-export-entry project))
-                                "blog|BLOG")))))
-     (org-publish-get-files (org-publish-expand-projects
-                             (list (org-publish-get-project-from-filename 
-                                    (buffer-file-name) 'up)))))
+    (let ((project (org-publish-get-project-from-filename (buffer-file-name) 
+                                                          'up)))
+     (mapc 
+      (lambda (jfile)
+        (if (string= (file-name-extension jfile) "org")
+            (with-current-buffer (org-get-jekyll-file-buffer jfile)
+              ;; It fails for non-visible entries, CONTENT visibility
+              ;; mode ensures that all of them are visible.
+              (org-content)
+              (org-map-entries (lambda () (org-jekyll-export-entry project))
+                               "blog|BLOG"))))
+      (org-publish-get-base-files project)))
     (org-release-buffers org-jekyll-new-buffers)))
 
 (provide 'org-jekyll)
