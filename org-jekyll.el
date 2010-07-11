@@ -38,11 +38,9 @@
 (defun org-jekyll-publish-dir (project &optional category)
   "Where does the project go, by default a :blog-publishing-directory 
    entry in the org-publish-project-alist."
-  (let ((pdir (plist-get (cdr (assoc project org-publish-project-alist)) 
-                         :blog-publishing-directory)))
+  (let ((pdir (plist-get (cdr project) :blog-publishing-directory)))
     (unless pdir
-      (setq pdir (plist-get (cdr (assoc project org-publish-project-alist)) 
-                            :publishing-directory)))
+      (setq pdir (plist-get (cdr project) :publishing-directory)))
     (concat pdir
             (if category (concat category "/") "")
             "_posts/")))
@@ -52,7 +50,7 @@
   permalinks follow.  Needed to replace entry titles with
   permalinks that RSS agregators and google buzz know how to
   follow.  Looks for a :site-root entry in the org-publish-project-alist."
-  (or (plist-get (cdr (assoc project org-publish-project-alist)) :site-root)
+  (or (plist-get (cdr project) :site-root)
       ""))
 
 
@@ -82,8 +80,7 @@
   fname)
 
 (defun org-jekyll-sanitize-string (str project)
-  (if (plist-get (cdr (assoc project org-publish-project-alist)) 
-                 :jekyll-sanitize-permalinks)
+  (if (plist-get (cdr project) :jekyll-sanitize-permalinks)
       (progn (setq str (downcase str))
              (dolist (c '(("á" . "a")
                           ("é" . "e")
