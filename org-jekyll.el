@@ -181,8 +181,7 @@ title. "
   (interactive)
   (save-excursion
     (setq org-jekyll-new-buffers nil)
-    (let ((project (org-publish-get-project-from-filename (buffer-file-name) 
-                                                          'up)))
+    (let ((project (org-publish-get-project-from-filename (buffer-file-name)))) 
      (mapc 
       (lambda (jfile)
         (if (string= (file-name-extension jfile) "org")
