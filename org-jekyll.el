@@ -140,7 +140,7 @@
                  "<h2 id=\"sec-1\">\\(.+\\)</h2>"
                  (concat "<h2 id=\"sec-1\"><a href=\"" site-root
                          "{{ page.url }}\">\\1</a></h2>")
-                 (org-export-as-html nil nil nil 'string t nil)))
+                 (org-export-as-html nil nil '(:tags nil) 'string t nil)))
           (set-buffer org-buffer)
           (delete-region (point-min) (point-max))
           (insert contents)
