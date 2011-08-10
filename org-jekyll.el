@@ -27,6 +27,11 @@
   nil. Use \"lang\" if you want to send posts in different
   languages to different directories.")
 
+(defvar org-jekyll-lang-subdirs nil
+  "Make it an assoc list indexed by language if you want to
+bypass the category subdir definition and build blog subdirs per
+language. ")
+
 (defvar org-jekyll-localize-dir nil
   "If non-nil and the lang property is set in the entry,
    org-jekyll will look for a lang.yml file in this directory and
@@ -38,12 +43,25 @@
 (defun org-jekyll-publish-dir (project &optional category)
   "Where does the project go, by default a :blog-publishing-directory 
    entry in the org-publish-project-alist."
-  (let ((pdir (plist-get (cdr project) :blog-publishing-directory)))
-    (unless pdir
-      (setq pdir (plist-get (cdr project) :publishing-directory)))
-    (concat pdir
-            (if category (concat category "/") "")
-            "_posts/")))
+  (princ category)
+  (if org-jekyll-lang-subdirs
+      (let ((pdir (plist-get (cdr project) :publishing-directory))
+            (langdir (cdr (assoc category org-jekyll-lang-subdirs))))
+        (if langdir
+            (concat pdir (cdr (assoc category org-jekyll-lang-subdirs)) 
+                    "_posts/")
+          (let ((ppdir (plist-get (cdr project) :blog-publishing-directory)))
+            (unless ppdir
+              (setq ppdir (plist-get (cdr project) :publishing-directory)))
+            (concat ppdir
+                    (if category (concat category "/") "")
+                    "_posts/"))))
+    (let ((pdir (plist-get (cdr project) :blog-publishing-directory)))
+      (unless pdir
+        (setq pdir (plist-get (cdr project) :publishing-directory)))
+      (concat pdir
+              (if category (concat category "/") "")
+              "_posts/"))))
 
 (defun org-jekyll-site-root (project)
   "Site root, like http://yoursite.com, from which blog
