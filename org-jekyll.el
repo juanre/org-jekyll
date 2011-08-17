@@ -213,3 +213,5 @@ title. "
     (org-release-buffers org-jekyll-new-buffers)))
 
 (provide 'org-jekyll)
+
+;;; org-jekyll.el ends here
