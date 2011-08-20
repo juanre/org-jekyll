@@ -30,7 +30,11 @@
 (defvar org-jekyll-lang-subdirs nil
   "Make it an assoc list indexed by language if you want to
 bypass the category subdir definition and build blog subdirs per
-language. ")
+language.")
+
+(defvar org-jekyll-lang-permalinks nil
+  "Make it an assoc list indexed by language if you want to
+set a different permaling structure per language.  Crazy proliferation of language dependent assocs.")
 
 (defvar org-jekyll-localize-dir nil
   "If non-nil and the lang property is set in the entry,
@@ -45,7 +49,7 @@ language. ")
    entry in the org-publish-project-alist."
   (princ category)
   (if org-jekyll-lang-subdirs
-      (let ((pdir (plist-get (cdr project) :publishing-directory))
+      (let ((pdir (plist-get (cdr project) :blog-publishing-directory))
             (langdir (cdr (assoc category org-jekyll-lang-subdirs))))
         (if langdir
             (concat pdir (cdr (assoc category org-jekyll-lang-subdirs)) 
@@ -199,16 +203,17 @@ title. "
   (interactive)
   (save-excursion
     (setq org-jekyll-new-buffers nil)
-    (let ((project (org-publish-get-project-from-filename (buffer-file-name)))) 
-     (mapc 
-      (lambda (jfile)
-        (if (string= (file-name-extension jfile) "org")
-            (with-current-buffer (org-get-jekyll-file-buffer jfile)
-              ;; It fails for non-visible entries, CONTENT visibility
-              ;; mode ensures that all of them are visible.
-              (org-content)
-              (org-map-entries (lambda () (org-jekyll-export-entry project))
-                               "blog|BLOG"))))
+    (let ((project (org-publish-get-project-from-filename 
+                    (buffer-file-name)))) 
+      (mapc 
+       (lambda (jfile)
+         (if (string= (file-name-extension jfile) "org")
+             (with-current-buffer (org-get-jekyll-file-buffer jfile)
+               ;; It fails for non-visible entries, CONTENT visibility
+               ;; mode ensures that all of them are visible.
+               (org-content)
+               (org-map-entries (lambda () (org-jekyll-export-entry project))
+                                "blog|BLOG"))))
       (org-publish-get-base-files project)))
     (org-release-buffers org-jekyll-new-buffers)))
 
