@@ -30,7 +30,7 @@
 (defvar org-jekyll-lang-subdirs nil
   "Make it an assoc list indexed by language if you want to
 bypass the category subdir definition and build blog subdirs per
-language. ")
+language.")
 
 (defvar org-jekyll-localize-dir nil
   "If non-nil and the lang property is set in the entry,
