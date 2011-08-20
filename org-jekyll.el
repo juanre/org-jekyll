@@ -48,7 +48,7 @@ language.")
    entry in the org-publish-project-alist."
   (princ category)
   (if org-jekyll-lang-subdirs
-      (let ((pdir (plist-get (cdr project) :publishing-directory))
+      (let ((pdir (plist-get (cdr project) :blog-publishing-directory))
             (langdir (cdr (assoc category org-jekyll-lang-subdirs))))
         (if langdir
             (concat pdir (cdr (assoc category org-jekyll-lang-subdirs))
