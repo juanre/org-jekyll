@@ -1,25 +1,28 @@
 ;;; org-jekyll.el --- Export jekyll-ready posts form org-mode entries
-;;; 
+;;;
 ;;; Author: Juan Reyero
 ;;; Version: 0.3
-;;; Home page: http://juanreyero.com/open/org-jekyll/
+;;; Keywords: hypermedia
+;;; Package-Requires: ((org "7.5"))
+;;; Homepage: http://juanreyero.com/open/org-jekyll/
 ;;; Repository: http://github.com/juanre/org-jekyll
 ;;; Public clone: git://github.com/juanre/org-jekyll.git
-;;; 
-;;; Summary
-;;; -------
-;;; 
+;;;
+;;; Commentary:
+;;;
 ;;; Extract subtrees from your org-publish project files that have
 ;;; a :blog: keyword and an :on: property with a timestamp, and
 ;;; export them to a subdirectory _posts of your project's publishing
 ;;; directory in the year-month-day-title.html format that Jekyll
 ;;; expects.  Properties are passed over as yaml front-matter in the
 ;;; exported files.  The title of the subtree is the title of the
-;;; entry.  The title of the post is a link to the post's page.  
+;;; entry.  The title of the post is a link to the post's page.
 ;;;
 ;;; Look at http://orgmode.org/worg/org-tutorials/org-jekyll.php for
 ;;; more info on how to integrate org-mode with Jekyll, and for the
 ;;; inspiration of the main function down there.
+;;;
+;;; Code:
 
 (defvar org-jekyll-category nil
   "Specify a property which, if defined in the entry, is used as
@@ -41,14 +44,14 @@ language.")
   "Buffers created to visit org-publish project files looking for blog posts.")
 
 (defun org-jekyll-publish-dir (project &optional category)
-  "Where does the project go, by default a :blog-publishing-directory 
+  "Where does the project go, by default a :blog-publishing-directory
    entry in the org-publish-project-alist."
   (princ category)
   (if org-jekyll-lang-subdirs
       (let ((pdir (plist-get (cdr project) :publishing-directory))
             (langdir (cdr (assoc category org-jekyll-lang-subdirs))))
         (if langdir
-            (concat pdir (cdr (assoc category org-jekyll-lang-subdirs)) 
+            (concat pdir (cdr (assoc category org-jekyll-lang-subdirs))
                     "_posts/")
           (let ((ppdir (plist-get (cdr project) :blog-publishing-directory)))
             (unless ppdir
@@ -115,10 +118,10 @@ language.")
                           ("\\$" . "S")
                           ("€" . "E")))
                (setq str (replace-regexp-in-string (car c) (cdr c) str)))
-             (replace-regexp-in-string "[^abcdefghijklmnopqrstuvwxyz-]" "" 
+             (replace-regexp-in-string "[^abcdefghijklmnopqrstuvwxyz-]" ""
                                        (replace-regexp-in-string " +" "-" str)))
     str))
-    
+
 (defun org-jekyll-export-entry (project)
   (let* ((props (org-entry-properties nil 'standard))
          (time (cdr (or (assoc "on" props)
@@ -138,10 +141,10 @@ language.")
                                                "[ \t]" "-" heading)))
              (str-time (and (string-match "\\([[:digit:]\-]+\\) " time)
                             (match-string 1 time)))
-             (to-file (format "%s-%s.html" str-time 
+             (to-file (format "%s-%s.html" str-time
                               (org-jekyll-sanitize-string title project)))
              (org-buffer (current-buffer))
-             (yaml-front-matter (cons (cons "title" heading) 
+             (yaml-front-matter (cons (cons "title" heading)
                                       yaml-front-matter))
              html)
         (org-narrow-to-subtree)
@@ -153,8 +156,8 @@ language.")
           ;; fails when the entry is not visible (ie, within a folded
           ;; entry).
           (dotimes (n level nil) (org-promote-subtree))
-          (setq html 
-                (replace-regexp-in-string 
+          (setq html
+                (replace-regexp-in-string
                  "<h2 id=\"sec-1\">\\(.+\\)</h2>"
                  (concat "<h2 id=\"sec-1\"><a href=\"" site-root
                          "{{ page.url }}\">\\1</a></h2>")
@@ -165,11 +168,11 @@ language.")
           (save-buffer))
         (widen)
         (with-temp-file (ensure-directories-exist
-                         (expand-file-name 
+                         (expand-file-name
                           to-file (org-jekyll-publish-dir project category)))
           (when yaml-front-matter
             (insert "---\n")
-            (mapc (lambda (pair) 
+            (mapc (lambda (pair)
                     (insert (format "%s: %s\n" (car pair) (cdr pair))))
                   yaml-front-matter)
             (if (and org-jekyll-localize-dir lang)
@@ -184,6 +187,7 @@ language.")
 (declare-function org-publish-get-project-from-filename "org-publish"
                   (filename &optional up))
 
+;;;###autoload
 (defun org-jekyll-export-current-entry ()
   (interactive)
   (save-excursion
@@ -191,6 +195,7 @@ language.")
       (org-back-to-heading t)
       (org-jekyll-export-entry project))))
 
+;;;###autoload
 (defun org-jekyll-export-blog ()
   "Export all entries in project files that have a :blog: keyword
 and an :on: datestamp.  Property drawers are exported as
@@ -199,8 +204,8 @@ title. "
   (interactive)
   (save-excursion
     (setq org-jekyll-new-buffers nil)
-    (let ((project (org-publish-get-project-from-filename (buffer-file-name)))) 
-     (mapc 
+    (let ((project (org-publish-get-project-from-filename (buffer-file-name))))
+     (mapc
       (lambda (jfile)
         (if (string= (file-name-extension jfile) "org")
             (with-current-buffer (org-get-jekyll-file-buffer jfile)
@@ -213,3 +218,5 @@ title. "
     (org-release-buffers org-jekyll-new-buffers)))
 
 (provide 'org-jekyll)
+
+;;; org-jekyll.el ends here
