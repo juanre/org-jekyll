@@ -164,7 +164,8 @@ language.")
                  (format
                   "<h%d id=\"sec-1\"><a href=\"%s{{ page.url }}\">\\1</a></h%d>"
                   top-level site-root top-level)
-                 (org-export-as-html nil nil '(:tags nil) 'string t nil)))
+                 (org-export-as-html nil '(:tags nil :table-of-contents nil)
+                                     'string t nil)))
           (set-buffer org-buffer)
           (delete-region (point-min) (point-max))
           (insert contents)
