@@ -149,7 +149,7 @@ language.")
              html)
         (org-narrow-to-subtree)
         (let ((level (- (org-reduced-level (org-outline-level)) 1))
-              (top-level org-export-html-toplevel-hlevel)
+              (top-level org-html-toplevel-hlevel)
               (contents (buffer-substring (point-min) (point-max)))
               (site-root (org-jekyll-site-root project)))
           ;; Without the promotion the header with which the headline
@@ -164,7 +164,9 @@ language.")
                  (format
                   "<h%d id=\"sec-1\"><a href=\"%s{{ page.url }}\">\\1</a></h%d>"
                   top-level site-root top-level)
-                 (org-export-as-html nil nil '(:tags nil) 'string t nil)))
+                 (with-current-buffer
+                     (org-html-export-as-html nil t t t '(:tags nil))
+                   (buffer-string))))
           (set-buffer org-buffer)
           (delete-region (point-min) (point-max))
           (insert contents)
@@ -214,6 +216,7 @@ title. "
             (with-current-buffer (org-get-jekyll-file-buffer jfile)
               ;; It fails for non-visible entries, CONTENT visibility
               ;; mode ensures that all of them are visible.
+              (message (concat "org-jekyll: publishing " jfile ))
               (org-content)
               (org-map-entries (lambda () (org-jekyll-export-entry project))
                                "blog|BLOG"))))
