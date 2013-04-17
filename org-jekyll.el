@@ -149,6 +149,7 @@ language.")
              html)
         (org-narrow-to-subtree)
         (let ((level (- (org-reduced-level (org-outline-level)) 1))
+              (top-level org-export-html-toplevel-hlevel)
               (contents (buffer-substring (point-min) (point-max)))
               (site-root (org-jekyll-site-root project)))
           ;; Without the promotion the header with which the headline
@@ -158,9 +159,11 @@ language.")
           (dotimes (n level nil) (org-promote-subtree))
           (setq html
                 (replace-regexp-in-string
-                 "<h2 id=\"sec-1\">\\(.+\\)</h2>"
-                 (concat "<h2 id=\"sec-1\"><a href=\"" site-root
-                         "{{ page.url }}\">\\1</a></h2>")
+                 (format "<h%d id=\"sec-1\">\\(.+\\)</h%d>"
+                         top-level top-level)
+                 (format
+                  "<h%d id=\"sec-1\"><a href=\"%s{{ page.url }}\">\\1</a></h%d>"
+                  top-level site-root top-level)
                  (org-export-as-html nil nil '(:tags nil) 'string t nil)))
           (set-buffer org-buffer)
           (delete-region (point-min) (point-max))
