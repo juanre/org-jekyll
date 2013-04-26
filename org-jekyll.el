@@ -223,6 +223,29 @@ title. "
       (org-publish-get-base-files project)))
     (org-release-buffers org-jekyll-new-buffers)))
 
+;;;###autoload
+(defun org-jekyll-export-project (project-name)
+  "Export all entries in project files that have a :blog: keyword
+and an :on: datestamp.  Property drawers are exported as
+front-matters, outline entry title is the exported document
+title. "
+  (interactive)
+  (save-excursion
+    (setq org-jekyll-new-buffers nil)
+    (let ((project (assoc project-name org-publish-project-alist)))
+     (mapc
+      (lambda (jfile)
+        (if (string= (file-name-extension jfile) (plist-get (cdr project) :base-extension))
+            (with-current-buffer (org-get-jekyll-file-buffer jfile)
+              ;; It fails for non-visible entries, CONTENT visibility
+              ;; mode ensures that all of them are visible.
+              (message (concat "org-jekyll: publishing " jfile ))
+              (org-content)
+              (org-map-entries (lambda () (org-jekyll-export-entry project))
+                               "blog|BLOG"))))
+      (org-publish-get-base-files project)))
+    (org-release-buffers org-jekyll-new-buffers)))
+
 (provide 'org-jekyll)
 
 ;;; org-jekyll.el ends here
