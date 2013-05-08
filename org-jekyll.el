@@ -24,6 +24,8 @@
 ;;;
 ;;; Code:
 
+;;(require 'ox-html)
+
 (defvar org-jekyll-category nil
   "Specify a property which, if defined in the entry, is used as
   a category: the post is written to category/_posts. Ignored if
@@ -165,7 +167,9 @@ language.")
                   "<h%d id=\"sec-1\"><a href=\"%s{{ page.url }}\">\\1</a></h%d>"
                   top-level site-root top-level)
                  (with-current-buffer
-                     (org-html-export-as-html nil t t t '(:tags nil))
+                     (org-html-export-as-html nil t t t
+                                              '(:tags nil
+                                                :table-of-contents nil))
                    (buffer-string))))
           (set-buffer org-buffer)
           (delete-region (point-min) (point-max))
@@ -235,7 +239,8 @@ title. "
     (let ((project (assoc project-name org-publish-project-alist)))
      (mapc
       (lambda (jfile)
-        (if (string= (file-name-extension jfile) (plist-get (cdr project) :base-extension))
+        (if (string= (file-name-extension jfile) (plist-get (cdr project)
+                                                            :base-extension))
             (with-current-buffer (org-get-jekyll-file-buffer jfile)
               ;; It fails for non-visible entries, CONTENT visibility
               ;; mode ensures that all of them are visible.
