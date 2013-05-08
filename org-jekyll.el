@@ -1,9 +1,9 @@
 ;;; org-jekyll.el --- Export jekyll-ready posts form org-mode entries
 ;;;
 ;;; Author: Juan Reyero
-;;; Version: 0.3
+;;; Version: 0.4
 ;;; Keywords: hypermedia
-;;; Package-Requires: ((org "7.5"))
+;;; Package-Requires: ((org "8.0"))
 ;;; Homepage: http://juanreyero.com/open/org-jekyll/
 ;;; Repository: http://github.com/juanre/org-jekyll
 ;;; Public clone: git://github.com/juanre/org-jekyll.git
