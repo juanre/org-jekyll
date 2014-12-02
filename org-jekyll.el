@@ -1,4 +1,4 @@
-;;; org-jekyll.el --- Export jekyll-ready posts form org-mode entries
+;;; org-jekyll.el --- Export jekyll-ready posts from org-mode entries
 ;;;
 ;;; Author: Juan Reyero
 ;;; Version: 0.4
